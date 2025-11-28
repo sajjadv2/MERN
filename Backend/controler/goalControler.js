@@ -1,15 +1,22 @@
+const Goal = require('../models/goalModel');
 // @desc get all goals
 // @route GET /api/goals
 // @access public
 const getGoals =async (req,res)=>{
-    res.status(200).json({ message: 'get Goals' });
+    const goals = await Goal.find();
+    res.status(200).json(goals);
 }
 
 // @desc get single goal
 // @route GET /api/goals/:id
 // @access public
 const getGoal=async (req,res)=>{
-    res.status(200).json({ message: `goal id is ${req.params.id}` });
+    const goal = await Goal.findById(req.params.id);
+    if(!goal){
+        res.status(400)
+        throw new Error('goal not found');
+    }
+    res.status(200).json(goal);
 }
 
 //@desc set a new goal
@@ -22,21 +29,37 @@ const setGoal=async (req,res)=>{
         throw new Error('please add a text field');
     }
 
-    res.status(200).json({ message: 'post goal' });
+    const goal = await Goal.create({
+        text : req.body.text
+    });
+
+    res.status(200).json(goal);
 }   
 
 //@desc update a goal
 //@route PUT /api/goals/:id
 //@access public
 const updateGoal=async(req,res)=>{
-    res.status(200).json({ message: `update gaol that id is ${req.params.id}` });
+    const goal= await Goal.findById(req.params.id)
+    if(!goal){
+        res.status(400)
+        throw new Error('goal not found !')
+    }
+    const updatedGoal = await Goal.findByIdAndUpdate(req.params.id,req.body,{new:true} )
+    res.status(200).json(updatedGoal);
 }
 
 //@desc delete a goal
 //@route DELETE /api/goals/:id
 //@access public
 const deleteGoal=async (req,res)=>{
-    res.status(200).json({ message: `delete gaoal with id ${req.params.id}` });
+    const goal = await Goal.findById(req.params.id)
+    if(!goal){
+        res.status(400)
+        throw new Error('goal not found!')
+    }
+    await Goal.findByIdAndDelete(req.params.id);
+    res.status(200).json({message : `delete goal ${req.params.id}`});
 }   
 
 
