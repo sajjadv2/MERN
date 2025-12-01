@@ -1,9 +1,10 @@
 const Goal = require('../models/goalModel');
+const User = require('../models/userModel');
 // @desc get all goals
 // @route GET /api/goals
 // @access public
 const getGoals =async (req,res)=>{
-    const goals = await Goal.find();
+    const goals = await Goal.find({user : req.user.id});
     res.status(200).json(goals);
 }
 
@@ -30,7 +31,8 @@ const setGoal=async (req,res)=>{
     }
 
     const goal = await Goal.create({
-        text : req.body.text
+        text : req.body.text,
+        user :req.user.id
     });
 
     res.status(200).json(goal);
@@ -45,6 +47,19 @@ const updateGoal=async(req,res)=>{
         res.status(400)
         throw new Error('goal not found !')
     }
+
+    //check for user 
+    const user=await User.findById(req.user.id)
+    if(!user){
+        res.status(401)
+        throw new Error('user not found ')
+    }
+
+    //mack sure the logged user matches the goal user
+    if(goal.user.toString() !== req.user.id){
+        res.status(401)
+        throw new Error('User not authorized')
+    } 
     const updatedGoal = await Goal.findByIdAndUpdate(req.params.id,req.body,{new:true} )
     res.status(200).json(updatedGoal);
 }
@@ -58,6 +73,21 @@ const deleteGoal=async (req,res)=>{
         res.status(400)
         throw new Error('goal not found!')
     }
+    console.log(goal)
+
+    //check for user 
+    const user=await User.findById(req.user.id)
+    if(!user){
+        res.status(401)
+        throw new Error('user not found ')
+    }
+    console.log(req.user.id)
+    //mack sure the logged user matches the goal user
+    if(goal.user.toString() !== req.user.id){
+        res.status(401)
+        throw new Error('User not authorized')
+    } 
+
     await Goal.findByIdAndDelete(req.params.id);
     res.status(200).json({message : `delete goal ${req.params.id}`});
 }   

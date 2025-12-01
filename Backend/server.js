@@ -1,12 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
-const colors = require('colors');
 const { connectDB } = require('./config/db');
-const { errorHandler } = require('./errorMiddleware/errorHandler')
-const goalRoutes = require('./routes/goalRoutes');
+const { errorHandler } = require('./Middleware/errorHandler')
 
 //connect DB
 connectDB();
+
 
 // Initialize express app
 const app = express();
@@ -18,8 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Use goal routes
-app.use('/api/goals', goalRoutes);
+app.use('/api/goals', require('./routes/goalRoutes'));
 
+// Use user routes
+app.use('/api/users', require('./routes/userRouters'));
+
+// Use error handler middleware
 app.use(errorHandler)
 
 // Start the server

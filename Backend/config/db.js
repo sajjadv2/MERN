@@ -11,6 +11,10 @@ const connectDB=async()=>{
     }
 }
 
+// const connectdb2= mongoose.connect(process.env.MONGO_URI)
+//     .then(()=>console.log('connect to mongodb ^_^'))
+//     .catch((error)=>console.log(`connect to db faild ${error}`))
+
 module.exports={
     connectDB,
 }
